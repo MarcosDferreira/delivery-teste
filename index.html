@@ -97,8 +97,6 @@ footer{text-align:center;padding:26px 15px;color:#fff;background:#07152f;border-
 .patrocinio p{color:var(--dourado);font-size:13px;font-weight:bold;margin:0}
 .logo-legadu{width:100%;max-width:210px;height:auto;object-fit:contain}
 .link-admin{margin-top:17px;font-size:12px}.link-admin a{color:#dceaff;text-decoration:none;opacity:.9}
-
-/* Acessibilidade */
 .skip-link{position:absolute;left:10px;top:-60px;z-index:1000;background:#fff;color:#07152f;padding:12px 16px;border:2px solid var(--dourado);border-radius:8px;font-weight:bold}
 .skip-link:focus{top:10px}
 .acessibilidade{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:7px;padding:9px 10px;background:#fff;border-bottom:1px solid var(--linha)}
@@ -130,7 +128,7 @@ button,a,input,select{touch-action:manipulation}
  <button type="button" id="alternarContraste" aria-pressed="false">Alto contraste</button>
 </nav>
 <main id="conteudoPrincipal" tabindex="-1">
- <section class="conta-topo">
+ <section class="conta-topo" id="secaoConta">
   <h2 class="titulo-secao">Seu acesso</h2>
   <div id="acessoCliente">
    <h3 id="tituloAcesso">Entre ou faça seu cadastro para pedir</h3>
@@ -198,7 +196,7 @@ button,a,input,select{touch-action:manipulation}
    <div class="resumo-valores">
     <div class="linha-valor"><span>Produtos</span><strong id="subtotal">R$ 0,00</strong></div>
     <div class="linha-valor"><span>Frete</span><strong id="frete">R$ 0,00</strong></div>
-    <div class="linha-valor linha-total"><span>Total do pedido</span><strong id="total">R$ 0,00</strong></div>
+        <div class="linha-valor linha-total"><span>Total do pedido</span><strong id="total">R$ 0,00</strong></div>
    </div>
   </div>
 
@@ -222,8 +220,8 @@ button,a,input,select{touch-action:manipulation}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL='https://bnnfplpccsxaaztgbxkr.supabase.co';
-const SUPABASE_KEY='sb_publishable_dws08TQirwdC5MI3UITfog_AWVc8eL5';
+const SUPABASE_URL='https://hzbwkuhafpjuqdfjuyzd.supabase.co';
+const SUPABASE_KEY='sb_publishable_40GSmLjkiFuJ1LeSQPA9TA_kxBLOAU9';
 const banco=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const AUTH_URL=SUPABASE_URL+'/functions/v1/cliente-auth';
 const CHAVE_SESSAO='feiraLuaSessao';
@@ -267,7 +265,6 @@ function sincronizarReserva(){
  });
  return reservaFila;
 }
-// Acessibilidade: controles simples, sem alterar dados do cliente.
 (function configurarAcessibilidade(){
  const corpo=document.body;
  document.getElementById('aumentarFonte').addEventListener('click',()=>corpo.classList.add('fonte-grande'));
@@ -278,7 +275,6 @@ function sincronizarReserva(){
   this.textContent=ativo?'Contraste normal':'Alto contraste';
  });
 })();
-// Copia o celular para o WhatsApp automaticamente, mas respeita uma edição manual.
 (function configurarWhatsAppCadastro(){
  const celular=document.getElementById('cadastroTelefone');
  const whatsapp=document.getElementById('cadastroWhatsApp');
@@ -379,7 +375,7 @@ async function salvarEdicao(){
  try{const r=await chamarAuth({acao:'update_profile',nome,whatsapp,endereco,bairro_id:Number(bairro_id)},tokenCliente);aplicarCliente(r.cliente||{...clienteLogado,nome,whatsapp,endereco,bairro_id:Number(bairro_id)});mensagemAcesso('Cadastro atualizado com sucesso!');}
  catch(e){mensagemAcesso(e.message,true);}
 }
-async function carregarFretes(){
+ async function carregarFretes(){
  const ids=['cadastroBairro','edicaoBairro'];
  try{
   const [rb,rr]=await Promise.all([
