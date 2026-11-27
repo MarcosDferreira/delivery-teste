@@ -170,6 +170,40 @@ body.cliente-autenticado #conteudoLoja{display:block!important}
  .conta-topo #painelLogin> .campo:nth-of-type(2) > div button{width:100%}
 }
 
+
+/* Ajuste final para celular: cabeçalho mais baixo e login compacto. */
+@media(max-width:480px){
+ header{height:132px;min-height:132px;background-size:cover;background-position:center center}
+ .acessibilidade{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:7px 8px}
+ .acessibilidade strong{grid-column:1/-1;width:auto;text-align:center;margin:0 0 1px;font-size:12px}
+ .acessibilidade button{width:100%;max-width:none;min-width:0;min-height:36px;padding:7px 5px;font-size:12px}
+ main{padding:8px 9px 18px}
+ .conta-topo{max-width:430px;margin:8px auto 13px;padding:10px;border-radius:14px}
+ .conta-topo .titulo-secao{font-size:21px;line-height:1.2;margin:0 0 9px}
+ .conta-topo #acessoCliente{padding:10px;border-radius:11px}
+ .conta-topo #tituloAcesso{font-size:18px;line-height:1.25;margin:0 0 7px}
+ .conta-topo #ajudaAcesso{font-size:13px;line-height:1.4;margin:0 0 8px}
+ .conta-topo .campo{margin:9px 0 11px}
+ .conta-topo .campo label{font-size:13px;margin-bottom:5px}
+ .conta-topo .campo input,.conta-topo .campo select{min-height:47px;padding:11px 12px;font-size:16px;border-radius:10px}
+ .conta-topo #painelLogin> .campo:nth-of-type(2) > div{gap:6px}
+ .conta-topo #painelLogin> .campo:nth-of-type(2) > div button{min-width:72px;min-height:47px;padding:7px 9px;font-size:12px}
+ .conta-topo #painelLogin>button.finalizar,.conta-topo #painelCadastro>button.finalizar,.conta-topo #painelTrocaSenha>button.finalizar{min-height:49px;margin-top:7px;font-size:16px}
+ .conta-topo #painelLogin>button[onclick="solicitarAjudaSenha()"]{font-size:13px!important;padding:5px 0}
+ .conta-topo #painelLogin>p.ajuda{font-size:12px;margin:9px 0 0;gap:6px}
+ .conta-topo #painelLogin>p.ajuda button{min-height:40px;padding:8px 14px;font-size:13px}
+}
+@media(max-width:360px){
+ header{height:118px;min-height:118px}
+ .conta-topo{padding:8px}
+ .conta-topo #acessoCliente{padding:9px}
+ .conta-topo #painelLogin> .campo:nth-of-type(2) > div{flex-wrap:wrap}
+ .conta-topo #painelLogin> .campo:nth-of-type(2) > div input{width:100%;flex-basis:100%}
+ .conta-topo #painelLogin> .campo:nth-of-type(2) > div button{width:100%}
+}
+#camposEntrega h3{margin:0 0 8px;color:var(--azul);font-size:17px}
+#camposEntrega{margin-top:8px}
+
 </style>
 </head>
 <body>
@@ -242,10 +276,11 @@ body.cliente-autenticado #conteudoLoja{display:block!important}
   <div id="avisoReserva" class="ajuda" style="display:none;font-weight:bold;color:#a8730b"></div>
 
   <div id="areaCheckout" class="checkout" style="display:none">
-   <h3 style="display:none">Como você quer receber seu pedido?</h3>
-   <div class="campo" style="display:none" aria-hidden="true"><label for="tipoEntrega">Escolha como receber</label><select id="tipoEntrega"><option value="entrega" selected>Receber em casa</option><option value="retirada">Retirar na Feira da Lua</option></select></div>
+   <!-- A entrega é sempre em casa. O campo oculto mantém compatibilidade com o cálculo do frete. -->
+   <input type="hidden" id="tipoEntrega" value="entrega">
    <div id="camposEntrega">
-    <div class="campo"><label for="clienteEndereco">Endereço de entrega</label><input id="clienteEndereco" readonly></div>
+    <h3>Local de entrega</h3>
+    <div class="campo"><label for="clienteEndereco">Endereço</label><input id="clienteEndereco" readonly></div>
     <div class="campo"><label for="clienteBairroNome">Bairro</label><input id="clienteBairroNome" readonly></div>
     <div class="ajuda">Para mudar seu endereço ou bairro, use “Editar meus dados”.</div>
    </div>
