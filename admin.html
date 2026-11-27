@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Administração | Feira da Lua</title>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#071638;color:#fff}
@@ -14,25 +15,39 @@ h2,h3{color:#10265a}
 input,select{width:100%;padding:13px;margin:7px 0 14px;border:1px solid #cbd4e7;border-radius:8px;font-size:16px}
 button{background:#10265a;color:white;border:0;padding:12px;border-radius:8px;font-weight:bold;width:100%;margin-top:7px;cursor:pointer}
 button:disabled{opacity:.6}
-.verde{background:#176b3a}.excluir{background:#c62828}.cancelar{background:#777}.amarelo{background:#a66b00}.azul{background:#2455a4}
-.produto,.pedido,.frete{border:1px solid #ddd;padding:12px;border-radius:9px;margin:12px 0}
+.verde{background:#176b3a}
+.excluir{background:#c62828}
+.cancelar{background:#777}
+.amarelo{background:#a66b00}
+.azul{background:#2455a4}
+.produto,.pedido,.frete-item{border:1px solid #ddd;padding:12px;border-radius:9px;margin:12px 0}
 .foto{width:100px;height:100px;object-fit:cover;border-radius:8px}
 .oculto{display:none!important}
-#mensagem,#mensagemFrete,#mensagemLogin,#mensagemRecuperacao,#mensagemNovaSenha{font-weight:bold;color:#176b3a;line-height:1.5}
+#mensagem{font-weight:bold;color:#176b3a}
+#mensagemLogin,#mensagemRecuperacao,#mensagemNovaSenha{font-weight:bold;color:#176b3a;line-height:1.5}
 .status{display:inline-block;padding:6px 9px;border-radius:6px;background:#e8edf7;color:#10265a;font-weight:bold;font-size:13px}
 .detalhe{background:#f2f5fa;padding:10px;border-radius:7px;margin:8px 0}
 .pequeno{font-size:13px;color:#555}
 .linha{border-top:1px solid #ddd;margin:12px 0}
 footer{text-align:center;padding:20px}
 .menu-admin{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
-.menu-admin button{min-height:115px;font-size:18px}
-.area-admin{display:none}.area-admin.ativa{display:block}
+.menu-admin button{min-height:100px;font-size:17px}
+.area-admin{display:none}
+.area-admin.ativa{display:block}
 .voltar{background:#777;margin-bottom:12px}
-@media(max-width:380px){.menu-admin{grid-template-columns:1fr}}
+.valor-frete{font-size:19px;font-weight:bold;color:#176b3a}
+.regiao-card{border:1px solid #ccd5e5;padding:13px;border-radius:10px;margin:12px 0}
+.bairro-card{background:#f2f5fa;padding:10px;border-radius:8px;margin:9px 0}
+.botao-pequeno{padding:9px;font-size:14px}
 </style>
 </head>
+
 <body>
-<header><h1>Feira da Lua</h1><p>Painel administrativo</p></header>
+<header>
+<h1>Feira da Lua</h1>
+<p>Painel administrativo</p>
+</header>
+
 <main>
 <section class="card" id="login">
 <h2>Entrar na administração</h2>
@@ -42,84 +57,825 @@ footer{text-align:center;padding:20px}
 <button class="azul" onclick="esqueciSenha()">Esqueci minha senha</button>
 <p id="mensagemLogin" role="status" aria-live="polite"></p>
 </section>
+
 <section class="card oculto" id="areaRecuperacao">
-<h2>Recuperar senha</h2><p>Informe o e-mail cadastrado para receber o link de recuperação.</p>
+<h2>Recuperar senha</h2>
+<p>Informe o e-mail cadastrado para receber o link de recuperação.</p>
 <input id="emailRecuperacao" type="email" placeholder="E-mail do administrador" autocomplete="email">
 <button class="verde" id="botaoEnviarRecuperacao" onclick="enviarRecuperacao()">Enviar link de recuperação</button>
-<button class="cancelar" onclick="voltarLogin()">Voltar ao login</button><p id="mensagemRecuperacao" role="status" aria-live="polite"></p>
+<button class="cancelar" onclick="voltarLogin()">Voltar ao login</button>
+<p id="mensagemRecuperacao" role="status" aria-live="polite"></p>
 </section>
+
 <section class="card oculto" id="areaNovaSenha">
-<h2>Cadastrar nova senha</h2><p>Escolha uma senha nova para acessar a administração.</p>
+<h2>Cadastrar nova senha</h2>
+<p>Escolha uma senha nova para acessar a administração.</p>
 <input id="novaSenha" type="password" placeholder="Nova senha (mínimo 6 caracteres)" autocomplete="new-password">
 <input id="confirmarNovaSenha" type="password" placeholder="Confirme a nova senha" autocomplete="new-password">
-<button class="verde" id="botaoSalvarNovaSenha" onclick="salvarNovaSenha()">Salvar nova senha</button><p id="mensagemNovaSenha" role="status" aria-live="polite"></p>
+<button class="verde" id="botaoSalvarNovaSenha" onclick="salvarNovaSenha()">Salvar nova senha</button>
+<p id="mensagemNovaSenha" role="status" aria-live="polite"></p>
 </section>
+
 <section id="painel" class="oculto">
-<div class="card"><p id="usuario"></p><button onclick="sair()">Sair da administração</button><button class="cancelar" onclick="location.href='index.html'">Voltar para a loja</button></div>
-<div id="inicioAdmin"><div class="card"><h2 style="text-align:center">Painel de controle</h2><p style="text-align:center">Escolha o que deseja acessar:</p><div class="menu-admin">
-<button class="verde" onclick="abrirArea('pedidos')">PEDIDOS</button><button class="azul" onclick="abrirArea('loja')">GERENCIAR LOJA</button><button class="amarelo" onclick="abrirArea('fretes')">FRETE POR BAIRRO</button>
-</div></div></div>
-<section id="areaPedidos" class="area-admin"><div class="card"><h2>Pedidos recebidos</h2><p class="pequeno">Acompanhe os pedidos feitos pelos clientes da Feira da Lua.</p><button class="voltar" onclick="voltarInicio()">Voltar ao início</button><button class="azul" onclick="carregarPedidos()">Atualizar pedidos</button><div id="listaPedidos">Os pedidos aparecerão aqui.</div></div></section>
-<section id="areaLoja" class="area-admin">
-<div class="card"><h2>Gerenciar loja</h2><p class="pequeno">Cadastre barracas, produtos, fotos e controle o estoque.</p><button class="voltar" onclick="voltarInicio()">Voltar ao início</button></div>
-<div class="card"><h2>Cadastrar feirante</h2><input id="nomeFeirante" placeholder="Nome da barraca"><input id="responsavel" placeholder="Nome do responsável"><button class="verde" onclick="cadastrarFeirante()">Cadastrar barraca</button></div>
-<div class="card"><h2>Barracas cadastradas</h2><p class="pequeno">Edite o nome da barraca ou do responsável sem alterar os produtos cadastrados.</p><div id="listaFeirantes">Carregando barracas...</div></div>
-<div class="card oculto" id="cardEditarFeirante"><h2>Editar barraca</h2><input id="editarNomeFeirante" placeholder="Nome da barraca"><input id="editarResponsavelFeirante" placeholder="Nome do responsável"><button class="verde" id="salvarFeirante" onclick="salvarEdicaoFeirante()">Salvar alterações</button><button class="cancelar" onclick="cancelarEdicaoFeirante()">Cancelar</button><p id="mensagemFeirante"></p></div>
-<div class="card"><h2 id="tituloProduto">Cadastrar produto</h2><select id="feiranteProduto"><option value="">Selecione a barraca</option></select><input id="nomeProduto" placeholder="Nome do produto"><input id="descricaoProduto" placeholder="Descrição"><input id="precoProduto" type="number" step="0.01" min="0.01" placeholder="Preço"><label><strong>Quantidade em estoque</strong></label><input id="estoqueProduto" type="number" min="0" step="1" value="0"><label><strong>Estoque mínimo para aviso</strong></label><input id="minimoProduto" type="number" min="0" step="1" value="3"><label><strong>Foto do produto</strong></label><input id="fotoProduto" type="file" accept="image/jpeg,image/png,image/webp"><img id="preview" class="foto oculto" alt="Prévia da foto"><button class="verde" id="salvar" onclick="salvarProduto()">Cadastrar produto</button><button class="cancelar oculto" id="cancelar" onclick="cancelarEdicao()">Cancelar edição</button><p id="mensagem"></p></div>
-<div class="card"><h2>Produtos cadastrados</h2><label><strong>Filtrar por barraca</strong></label><select id="filtroBarraca" onchange="mostrarProdutos()"><option value="">Todas as barracas</option></select><label><strong>Pesquisar produto</strong></label><input id="pesquisa" placeholder="Digite o nome do produto..." oninput="mostrarProdutos()"><div id="lista">Carregando...</div></div>
+<div class="card">
+<p id="usuario"></p>
+<button onclick="sair()">Sair da administração</button>
+<button class="cancelar" onclick="location.href='index.html'">Voltar para a loja</button>
+</div>
+
+<div id="inicioAdmin">
+<div class="card">
+<h2 style="text-align:center">Painel de controle</h2>
+<p style="text-align:center">Escolha o que deseja acessar:</p>
+<div class="menu-admin">
+<button class="verde" onclick="abrirArea('pedidos')">PEDIDOS</button>
+<button class="azul" onclick="abrirArea('loja')">GERENCIAR LOJA</button>
+<button class="amarelo" onclick="abrirArea('fretes')">FRETE POR REGIÃO</button>
+<button class="azul" onclick="abrirArea('senhas')">SENHA DE CLIENTE</button>
+</div>
+</div>
+</div>
+
+<section id="areaSenhas" class="area-admin">
+<div class="card">
+<h2>Redefinir senha de cliente</h2>
+<p class="pequeno">Use esta opção quando um cliente esquecer a senha. Informe o celular cadastrado e crie uma senha temporária com pelo menos 8 caracteres. Depois, envie a nova senha diretamente ao cliente pelo WhatsApp.</p>
+<button class="voltar" onclick="voltarInicio()">Voltar ao início</button>
+<label><strong>Celular cadastrado do cliente</strong></label>
+<input id="telefoneResetCliente" type="tel" inputmode="numeric" placeholder="DDD + celular">
+<label><strong>Nova senha temporária</strong></label>
+<input id="novaSenhaCliente" type="password" autocomplete="new-password" placeholder="Mínimo de 8 caracteres">
+<label><strong>Confirme a nova senha</strong></label>
+<input id="confirmarSenhaCliente" type="password" autocomplete="new-password" placeholder="Digite novamente a nova senha">
+<button class="verde" id="botaoRedefinirCliente" onclick="redefinirSenhaCliente()">Redefinir senha do cliente</button>
+<p id="mensagemResetCliente" role="status" aria-live="polite"></p>
+<p class="pequeno">Por segurança, a senha antiga não pode ser consultada. Esta opção cria uma nova senha e encerra as sessões antigas do cliente.</p>
+</div>
 </section>
-<section id="areaFretes" class="area-admin"><div class="card"><h2>Frete por bairro</h2><p class="pequeno">Cadastre os bairros de Ribeirão Grande e defina o valor da entrega. Para outras cidades, utilize a opção Externo.</p><button class="voltar" onclick="voltarInicio()">Voltar ao início</button><button class="azul" onclick="carregarFretes()">Atualizar bairros</button></div>
-<div class="card"><h2 id="tituloFrete">Cadastrar bairro</h2><label><strong>Tipo de entrega</strong></label><select id="tipoFrete" onchange="alterarTipoFrete()"><option value="cidade">Bairro de Ribeirão Grande</option><option value="externo">Externo</option></select><label><strong>Nome do bairro</strong></label><input id="bairroFrete" placeholder="Digite o nome do bairro"><label><strong>Valor do frete (R$)</strong></label><input id="valorFrete" type="number" min="0" step="0.01" placeholder="Ex.: 8,00"><button class="verde" id="salvarFrete" onclick="salvarFrete()">Cadastrar frete</button><button class="cancelar oculto" id="cancelarFrete" onclick="cancelarEdicaoFrete()">Cancelar edição</button><p id="mensagemFrete"></p></div>
-<div class="card"><h2>Bairros cadastrados</h2><p class="pequeno">Os valores abaixo serão utilizados no cálculo da entrega.</p><div id="listaFretes">Carregando bairros...</div></div></section>
-</section></main><footer>Feira da Lua de Ribeirão Grande</footer>
+
+<section id="areaPedidos" class="area-admin">
+<div class="card">
+<h2>Pedidos recebidos</h2>
+<p class="pequeno">Acompanhe os pedidos feitos pelos clientes.</p>
+<button class="voltar" onclick="voltarInicio()">Voltar ao início</button>
+<button class="azul" onclick="carregarPedidos()">Atualizar pedidos</button>
+<div id="listaPedidos">Os pedidos aparecerão aqui.</div>
+</div>
+</section>
+
+<section id="areaFretes" class="area-admin">
+<div class="card">
+<h2>Frete por região</h2>
+<p class="pequeno">Cadastre regiões e defina o valor do frete. Depois, vincule os bairros a cada região.</p>
+<button class="voltar" onclick="voltarInicio()">Voltar ao início</button>
+<h3 id="tituloRegiao">Cadastrar região</h3>
+<label><strong>Nome da região</strong></label>
+<input id="nomeRegiao" placeholder="Ex.: Região Central">
+<label><strong>Valor do frete (R$)</strong></label>
+<input id="valorRegiao" type="number" min="0" step="0.01" placeholder="Ex.: 5,00">
+<button class="verde" id="botaoSalvarRegiao" onclick="salvarRegiao()">Cadastrar região</button>
+<button class="cancelar oculto" id="botaoCancelarRegiao" onclick="cancelarEdicaoRegiao()">Cancelar edição</button>
+<p id="mensagemRegiao"></p>
+</div>
+
+<div class="card">
+<h2>Cadastrar bairro</h2>
+<label><strong>Região</strong></label>
+<select id="regiaoBairro"><option value="">Selecione a região</option></select>
+<label><strong>Nome do bairro</strong></label>
+<input id="nomeBairro" placeholder="Ex.: Centro, Nunes, Barreiro">
+<button class="verde" id="botaoSalvarBairro" onclick="salvarBairro()">Cadastrar bairro</button>
+<button class="cancelar oculto" id="botaoCancelarBairro" onclick="cancelarEdicaoBairro()">Cancelar edição</button>
+<p id="mensagemBairro"></p>
+</div>
+
+<div class="card">
+<h2>Entrega externa</h2>
+<p class="pequeno">Defina um valor exclusivo para entregas fora das regiões cadastradas.</p>
+<label><strong>Valor do frete externo (R$)</strong></label>
+<input id="valorExterno" type="number" min="0" step="0.01" placeholder="Ex.: 20,00">
+<button class="verde" onclick="salvarFreteExterno()">Salvar frete externo</button>
+<p id="mensagemExterno"></p>
+</div>
+
+<div class="card">
+<h2>Regiões e bairros cadastrados</h2>
+<div id="listaRegioes">Carregando regiões...</div>
+</div>
+<div class="card">
+<h2>Bairros sem região</h2>
+<p class="pequeno">Vincule estes bairros a uma região para organizar o frete.</p>
+<div id="listaBairrosSemRegiao">Carregando bairros...</div>
+</div>
+<div class="card">
+<h2>Entrega externa cadastrada</h2>
+<div id="listaFreteExterno">Carregando...</div>
+</div>
+</section>
+
+<section id="areaLoja" class="area-admin">
+<div class="card">
+<h2>Gerenciar loja</h2>
+<p class="pequeno">Cadastre barracas, produtos, fotos e controle o estoque.</p>
+<button class="voltar" onclick="voltarInicio()">Voltar ao início</button>
+</div>
+<div class="card">
+<h2>Cadastrar feirante</h2>
+<input id="nomeFeirante" placeholder="Nome da barraca">
+<input id="responsavel" placeholder="Nome do responsável">
+<button class="verde" onclick="cadastrarFeirante()">Cadastrar barraca</button>
+</div>
+<div class="card">
+<h2 id="tituloProduto">Cadastrar produto</h2>
+<select id="feiranteProduto"><option value="">Selecione a barraca</option></select>
+<input id="nomeProduto" placeholder="Nome do produto">
+<input id="descricaoProduto" placeholder="Descrição">
+<input id="precoProduto" type="number" step="0.01" min="0.01" placeholder="Preço">
+<label><strong>Quantidade em estoque</strong></label>
+<input id="estoqueProduto" type="number" min="0" step="1" value="0">
+<label><strong>Estoque mínimo para aviso</strong></label>
+<input id="minimoProduto" type="number" min="0" step="1" value="3">
+<label><strong>Foto do produto</strong></label>
+<input id="fotoProduto" type="file" accept="image/jpeg,image/png,image/webp">
+<img id="preview" class="foto oculto" alt="Prévia da foto">
+<button class="verde" id="salvar" onclick="salvarProduto()">Cadastrar produto</button>
+<button class="cancelar oculto" id="cancelar" onclick="cancelarEdicao()">Cancelar edição</button>
+<p id="mensagem"></p>
+</div>
+<div class="card">
+<h2>Produtos cadastrados</h2>
+<label><strong>Filtrar por barraca</strong></label>
+<select id="filtroBarraca" onchange="mostrarProdutos()"><option value="">Todas as barracas</option></select>
+<label><strong>Pesquisar produto</strong></label>
+<input id="pesquisa" placeholder="Digite o nome do produto..." oninput="mostrarProdutos()">
+<div id="lista">Carregando...</div>
+</div>
+</section>
+</section>
+</main>
+
+<footer>Feira da Lua de Ribeirão Grande</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL='https://hzbwkuhafpjuqdfjuvzd.supabase.co';
 const SUPABASE_KEY='sb_publishable_40GSmLjkiFuJ1LeSQPA9TA_kxBLOAU9';
-const banco=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{flowType:'implicit',detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}});
+const banco=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+ auth:{
+  detectSessionInUrl:true,
+  persistSession:true,
+  autoRefreshToken:true
+ }
+});
 const BUCKET='Produto';
-let feirantes=[],produtos=[],editando=null,fotoSelecionada=null,feiranteEditando=null,fretes=[],freteEditando=null;
-function abrirArea(area){document.getElementById('inicioAdmin').style.display='none';['pedidos','loja','fretes'].forEach(x=>document.getElementById('area'+x.charAt(0).toUpperCase()+x.slice(1)).classList.remove('ativa'));if(area==='pedidos'){document.getElementById('areaPedidos').classList.add('ativa');carregarPedidos()}if(area==='loja'){document.getElementById('areaLoja').classList.add('ativa');carregarDados()}if(area==='fretes'){document.getElementById('areaFretes').classList.add('ativa');carregarFretes()}window.scrollTo({top:0,behavior:'smooth'})}
-function voltarInicio(){['Pedidos','Loja','Fretes'].forEach(x=>document.getElementById('area'+x).classList.remove('ativa'));document.getElementById('inicioAdmin').style.display='block';window.scrollTo({top:0,behavior:'smooth'})}
-function abrirTelaNovaSenha(){document.getElementById('mensagemNovaSenha').textContent='';document.getElementById('novaSenha').value='';document.getElementById('confirmarNovaSenha').value='';mostrarSomente('areaNovaSenha')}
-banco.auth.onAuthStateChange((evento,session)=>{if(evento==='PASSWORD_RECOVERY'&&session?.access_token)abrirTelaNovaSenha()});
-(async function verificarRetornoRecuperacao(){const hash=window.location.hash||'',parametros=new URLSearchParams(hash.replace(/^#/,'')),tipo=parametros.get('type'),erro=parametros.get('error_description')||parametros.get('error');if(erro){mostrarSomente('login');document.getElementById('mensagemLogin').textContent='O link de recuperação apresentou um erro ou expirou. Solicite um novo e-mail.';return}if(tipo!=='recovery')return;const {data,error}=await banco.auth.getSession();if(error){mostrarSomente('login');document.getElementById('mensagemLogin').textContent='Erro ao validar o link: '+error.message;return}if(data.session?.access_token)abrirTelaNovaSenha();else{mostrarSomente('login');document.getElementById('mensagemLogin').textContent='Não foi possível validar o link. Solicite um novo e-mail de recuperação.'}})();
-document.getElementById('fotoProduto').addEventListener('change',function(){const arquivo=this.files[0],preview=document.getElementById('preview');fotoSelecionada=arquivo||null;if(!arquivo){preview.src='';preview.classList.add('oculto');return}if(!['image/jpeg','image/png','image/webp'].includes(arquivo.type)||arquivo.size>5*1024*1024){alert('Escolha uma foto JPG, PNG ou WEBP de até 5 MB.');this.value='';fotoSelecionada=null;preview.classList.add('oculto');return}preview.src=URL.createObjectURL(arquivo);preview.classList.remove('oculto')});
-function mensagem(t){document.getElementById('mensagem').textContent=t}function moeda(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}function criarElemento(tag,texto,classe){const el=document.createElement(tag);if(texto!==undefined)el.textContent=texto;if(classe)el.className=classe;return el}
-function mostrarSomente(id){['login','areaRecuperacao','areaNovaSenha','painel'].forEach(n=>{const el=document.getElementById(n);if(el)el.classList.toggle('oculto',n!==id)})}
-function voltarLogin(){mostrarSomente('login');document.getElementById('mensagemLogin').textContent='';document.getElementById('mensagemRecuperacao').textContent=''}
-function esqueciSenha(){document.getElementById('emailRecuperacao').value=document.getElementById('email').value.trim();document.getElementById('mensagemRecuperacao').textContent='';mostrarSomente('areaRecuperacao')}
-async function enviarRecuperacao(){const email=document.getElementById('emailRecuperacao').value.trim(),m=document.getElementById('mensagemRecuperacao'),b=document.getElementById('botaoEnviarRecuperacao');if(!email){m.textContent='Informe o e-mail cadastrado.';return}b.disabled=true;b.textContent='Enviando...';m.textContent='';try{const redirectTo=window.location.origin+window.location.pathname,{error}=await banco.auth.resetPasswordForEmail(email,{redirectTo});if(error)throw error;m.textContent='Solicitação enviada. Confira a caixa de entrada e a pasta de spam do e-mail informado.'}catch(e){m.textContent='Não foi possível enviar: '+(e.message||'erro desconhecido')}finally{b.disabled=false;b.textContent='Enviar link de recuperação'}}
-async function salvarNovaSenha(){const senha=document.getElementById('novaSenha').value,confirmacao=document.getElementById('confirmarNovaSenha').value,m=document.getElementById('mensagemNovaSenha'),b=document.getElementById('botaoSalvarNovaSenha');if(senha.length<6){m.textContent='A senha precisa ter pelo menos 6 caracteres.';return}if(senha!==confirmacao){m.textContent='As senhas não são iguais.';return}b.disabled=true;b.textContent='Salvando...';m.textContent='';try{const {data,error:erroSessao}=await banco.auth.getSession();if(erroSessao)throw erroSessao;if(!data.session)throw new Error('Sua sessão de recuperação não foi encontrada. Solicite um novo link de recuperação.');const {error}=await banco.auth.updateUser({password:senha});if(error)throw error;await banco.auth.signOut();document.getElementById('novaSenha').value='';document.getElementById('confirmarNovaSenha').value='';document.getElementById('senha').value='';mostrarSomente('login');document.getElementById('mensagemLogin').textContent='Senha alterada com sucesso! Entre com sua nova senha.'}catch(e){m.textContent='Não foi possível alterar a senha: '+(e.message||'erro desconhecido')}finally{b.disabled=false;b.textContent='Salvar nova senha'}}
-async function entrar(){const email=document.getElementById('email').value.trim(),senha=document.getElementById('senha').value;if(!email||!senha){alert('Informe seu e-mail e senha.');return}const {data,error}=await banco.auth.signInWithPassword({email,password:senha});if(error){alert('Não foi possível entrar: '+error.message);return}const {data:admin,error:erroAdmin}=await banco.from('admins').select('user_id').eq('user_id',data.user.id).maybeSingle();if(erroAdmin||!admin){await banco.auth.signOut();alert('Este usuário não tem permissão de administrador.');return}document.getElementById('login').classList.add('oculto');document.getElementById('painel').classList.remove('oculto');document.getElementById('usuario').textContent='Acesso liberado: '+email;voltarInicio()}
-async function sair(){await banco.auth.signOut();location.reload()}
-async function carregarDados(){const [f,p]=await Promise.all([banco.from('feirantes').select('id,nome,responsavel').order('nome'),banco.from('produtos').select('id,feirante_id,nome,preco,descricao,imagem_url,estoque,estoque_minimo').eq('ativo',true).order('nome')]);if(f.error||p.error){mensagem('Erro ao carregar dados: '+(f.error?.message||p.error?.message));return}feirantes=f.data||[];produtos=p.data||[];const s=document.getElementById('feiranteProduto');s.innerHTML='<option value="">Selecione a barraca</option>';feirantes.forEach(f=>{const o=document.createElement('option');o.value=f.id;o.textContent=f.nome;s.appendChild(o)});const filtro=document.getElementById('filtroBarraca'),anterior=filtro.value;filtro.innerHTML='<option value="">Todas as barracas</option>';feirantes.forEach(f=>{const o=document.createElement('option');o.value=f.id;o.textContent=f.nome;filtro.appendChild(o)});if(feirantes.some(f=>String(f.id)===anterior))filtro.value=anterior;mostrarListaFeirantes();mostrarProdutos()}
-async function cadastrarFeirante(){const nome=document.getElementById('nomeFeirante').value.trim(),responsavel=document.getElementById('responsavel').value.trim();if(!nome){alert('Informe o nome da barraca.');return}const {error}=await banco.from('feirantes').insert({nome,responsavel,ativo:true});if(error){mensagem('Erro: '+error.message);return}document.getElementById('nomeFeirante').value='';document.getElementById('responsavel').value='';mensagem('Barraca cadastrada com sucesso!');await carregarDados()}
-function mostrarListaFeirantes(){const l=document.getElementById('listaFeirantes');if(!l)return;l.innerHTML='';if(!feirantes.length){l.textContent='Nenhuma barraca cadastrada.';return}feirantes.forEach(f=>{const c=criarElemento('div',undefined,'produto');c.appendChild(criarElemento('h3',f.nome||'Barraca sem nome'));c.appendChild(criarElemento('p','Responsável: '+(f.responsavel||'Não informado')));const b=criarElemento('button','Editar barraca','azul');b.onclick=()=>editarFeirante(f.id);c.appendChild(b);l.appendChild(c)})}
-function editarFeirante(id){const f=feirantes.find(x=>String(x.id)===String(id));if(!f)return;feiranteEditando=f.id;document.getElementById('editarNomeFeirante').value=f.nome||'';document.getElementById('editarResponsavelFeirante').value=f.responsavel||'';document.getElementById('mensagemFeirante').textContent='';document.getElementById('cardEditarFeirante').classList.remove('oculto');document.getElementById('cardEditarFeirante').scrollIntoView({behavior:'smooth'})}
-function cancelarEdicaoFeirante(){feiranteEditando=null;document.getElementById('editarNomeFeirante').value='';document.getElementById('editarResponsavelFeirante').value='';document.getElementById('mensagemFeirante').textContent='';document.getElementById('cardEditarFeirante').classList.add('oculto')}
-async function salvarEdicaoFeirante(){if(feiranteEditando===null)return;const nome=document.getElementById('editarNomeFeirante').value.trim(),responsavel=document.getElementById('editarResponsavelFeirante').value.trim(),aviso=document.getElementById('mensagemFeirante');if(!nome){aviso.textContent='Informe o nome da barraca.';return}const b=document.getElementById('salvarFeirante');b.disabled=true;b.textContent='Salvando...';try{const {error}=await banco.from('feirantes').update({nome,responsavel}).eq('id',feiranteEditando);if(error)throw error;cancelarEdicaoFeirante();mensagem('Barraca atualizada com sucesso!');await carregarDados()}catch(e){aviso.textContent='Não foi possível atualizar: '+e.message}finally{b.disabled=false;b.textContent='Salvar alterações'}}
-async function salvarProduto(){const feirante_id=document.getElementById('feiranteProduto').value,nome=document.getElementById('nomeProduto').value.trim(),descricao=document.getElementById('descricaoProduto').value.trim(),preco=Number(document.getElementById('precoProduto').value),estoque=Number(document.getElementById('estoqueProduto').value),estoque_minimo=Number(document.getElementById('minimoProduto').value);if(!feirante_id||!nome||!Number.isFinite(preco)||preco<=0){alert('Preencha a barraca, o nome e o preço.');return}if(!Number.isInteger(estoque)||estoque<0||!Number.isInteger(estoque_minimo)||estoque_minimo<0){alert('Informe quantidades inteiras e não negativas para o estoque.');return}const b=document.getElementById('salvar');b.disabled=true;b.textContent='Salvando...';try{let id=editando,fotoAntiga=null;const dados={feirante_id:Number(feirante_id),nome,descricao,preco,estoque,estoque_minimo};if(editando!==null){const atual=produtos.find(p=>Number(p.id)===Number(editando));fotoAntiga=atual?.imagem_url||null;const {error}=await banco.from('produtos').update(dados).eq('id',editando).eq('ativo',true);if(error)throw error}else{const {data,error}=await banco.from('produtos').insert({...dados,ativo:true}).select('id').single();if(error)throw error;id=data.id}if(fotoSelecionada)await enviarFoto(id,fotoSelecionada,fotoAntiga);cancelarEdicao();mensagem('Produto salvo com sucesso!');await carregarDados()}catch(e){mensagem('Erro ao salvar: '+e.message)}finally{b.disabled=false;b.textContent=editando!==null?'Salvar alterações':'Cadastrar produto'}}
-async function enviarFoto(id,arquivo,fotoAntiga){const ext=arquivo.name.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg',caminho=id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext,{error}=await banco.storage.from(BUCKET).upload(caminho,arquivo,{cacheControl:'3600',upsert:false,contentType:arquivo.type});if(error)throw error;const {data}=banco.storage.from(BUCKET).getPublicUrl(caminho),{error:erroBanco}=await banco.from('produtos').update({imagem_url:data.publicUrl}).eq('id',id);if(erroBanco){await banco.storage.from(BUCKET).remove([caminho]);throw erroBanco}if(fotoAntiga){const antigo=obterCaminhoFoto(fotoAntiga);if(antigo)await banco.storage.from(BUCKET).remove([antigo])}}
-function obterCaminhoFoto(url){const marcador='/storage/v1/object/public/'+BUCKET+'/',pos=url.indexOf(marcador);return pos<0?null:decodeURIComponent(url.substring(pos+marcador.length))}
-function editarProduto(id){const p=produtos.find(x=>Number(x.id)===Number(id));if(!p)return;editando=p.id;fotoSelecionada=null;document.getElementById('feiranteProduto').value=p.feirante_id;document.getElementById('nomeProduto').value=p.nome;document.getElementById('descricaoProduto').value=p.descricao||'';document.getElementById('precoProduto').value=p.preco;document.getElementById('estoqueProduto').value=p.estoque??0;document.getElementById('minimoProduto').value=p.estoque_minimo??3;document.getElementById('fotoProduto').value='';const preview=document.getElementById('preview');if(p.imagem_url){preview.src=p.imagem_url;preview.classList.remove('oculto')}else{preview.src='';preview.classList.add('oculto')}document.getElementById('tituloProduto').textContent='Editar produto';document.getElementById('salvar').textContent='Salvar alterações';document.getElementById('cancelar').classList.remove('oculto');document.getElementById('tituloProduto').scrollIntoView({behavior:'smooth'})}
-function cancelarEdicao(){editando=null;fotoSelecionada=null;document.getElementById('feiranteProduto').value='';document.getElementById('nomeProduto').value='';document.getElementById('descricaoProduto').value='';document.getElementById('precoProduto').value='';document.getElementById('estoqueProduto').value=0;document.getElementById('minimoProduto').value=3;document.getElementById('fotoProduto').value='';document.getElementById('preview').src='';document.getElementById('preview').classList.add('oculto');document.getElementById('tituloProduto').textContent='Cadastrar produto';document.getElementById('salvar').textContent='Cadastrar produto';document.getElementById('cancelar').classList.add('oculto')}
-function mostrarProdutos(){const termo=document.getElementById('pesquisa').value.trim().toLowerCase(),filtro=document.getElementById('filtroBarraca').value,l=document.getElementById('lista');l.innerHTML='';const achados=produtos.filter(p=>{const f=feirantes.find(x=>Number(x.id)===Number(p.feirante_id));return(p.nome.toLowerCase().includes(termo)||(f?.nome||'').toLowerCase().includes(termo))&&(!filtro||String(p.feirante_id)===String(filtro))});if(!achados.length){l.textContent='Nenhum produto encontrado nesta barraca.';return}achados.forEach(p=>{const f=feirantes.find(x=>Number(x.id)===Number(p.feirante_id)),c=criarElemento('div',undefined,'produto');c.appendChild(criarElemento('h3',p.nome));c.appendChild(criarElemento('p','Barraca: '+(f?.nome||'Não identificada')));c.appendChild(criarElemento('p',moeda(p.preco)));const q=Number(p.estoque||0),m=Number(p.estoque_minimo||0);let t='Estoque: '+q+' unidade(s)';if(q===0)t+=' | ESGOTADO';else if(q<=m)t+=' | ÚLTIMAS UNIDADES';c.appendChild(criarElemento('p',t,'detalhe'));c.appendChild(criarElemento('p','Aviso de estoque mínimo: '+m,'pequeno'));if(p.imagem_url){const img=document.createElement('img');img.src=p.imagem_url;img.className='foto';img.alt=p.nome;c.appendChild(img);const ex=criarElemento('button','Excluir foto','excluir');ex.onclick=()=>removerFoto(p.id,p.imagem_url);c.appendChild(ex)}else c.appendChild(criarElemento('p','Produto sem foto.'));const ed=criarElemento('button','Editar produto');ed.onclick=()=>editarProduto(p.id);const ex=criarElemento('button','Retirar da vitrine','excluir');ex.onclick=()=>excluirProduto(p.id,p.nome);c.append(ed,ex);l.appendChild(c)})}
-async function carregarPedidos(){const l=document.getElementById('listaPedidos');l.textContent='Carregando pedidos...';const {data,error}=await banco.from('pedidos').select('id,cliente_nome,cliente_telefone,tipo_entrega,endereco,bairro,frete,itens,total,status,criado_em').order('criado_em',{ascending:false}).limit(100);if(error){l.textContent='Erro ao carregar pedidos: '+error.message;return}l.innerHTML='';if(!data||!data.length){l.textContent='Nenhum pedido recebido até agora.';return}data.forEach(p=>mostrarPedido(p,l))}
-function mostrarPedido(p,lista){const card=criarElemento('div',undefined,'pedido');card.appendChild(criarElemento('h3','Pedido #'+p.id));card.appendChild(criarElemento('span',String(p.status||'').toUpperCase(),'status'));card.appendChild(criarElemento('p','Cliente: '+(p.cliente_nome||'')));card.appendChild(criarElemento('p','Telefone: '+(p.cliente_telefone||'')));const entrega=p.tipo_entrega==='retirada'?'Retirada na Feira da Lua':'Entrega no endereço: '+(p.endereco||'Não informado');card.appendChild(criarElemento('p',entrega));if(p.bairro)card.appendChild(criarElemento('p','Bairro/região: '+p.bairro));card.appendChild(criarElemento('p','Frete: '+moeda(p.frete||0)));const data=new Date(p.criado_em);card.appendChild(criarElemento('p','Recebido: '+data.toLocaleString('pt-BR'),'pequeno'));card.appendChild(criarElemento('div','Produtos','linha'));if(Array.isArray(p.itens))p.itens.forEach(item=>{const nome=item.nome||'Produto',q=Number(item.quantidade||0),preco=Number(item.preco_unitario||0);card.appendChild(criarElemento('p',q+' x '+nome+' | '+moeda(preco*q)))});card.appendChild(criarElemento('h3','Total: '+moeda(p.total)));
-const imprimir80=criarElemento('button','Imprimir comprovante (80 mm)','verde');imprimir80.onclick=()=>imprimirPedido(p,'80mm');card.appendChild(imprimir80);const imprimirA4=criarElemento('button','Imprimir em folha A4','azul');imprimirA4.onclick=()=>imprimirPedido(p,'A4');card.appendChild(imprimirA4);
-if(p.status==='novo'){const b=criarElemento('button','Confirmar pedido','verde');b.onclick=()=>confirmarPedido(p.id);card.appendChild(b)}if(['confirmado','em_preparo','saiu_entrega'].includes(p.status)){const etapas={confirmado:{proximo:'em_preparo',texto:'Iniciar preparo'},em_preparo:{proximo:'saiu_entrega',texto:'Saiu para entrega'},saiu_entrega:{proximo:'concluido',texto:'Concluir pedido'}},etapa=etapas[p.status],b=criarElemento('button',etapa.texto,'azul');b.onclick=()=>atualizarStatus(p.id,etapa.proximo);card.appendChild(b)}if(['novo','confirmado','em_preparo','saiu_entrega'].includes(p.status)){const b=criarElemento('button','Cancelar pedido','excluir');b.onclick=()=>cancelarPedido(p.id);card.appendChild(b)}lista.appendChild(card)}
-function escaparHTML(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function imprimirPedido(p,formato){const itens=Array.isArray(p.itens)?p.itens:[],frete=Number(p.frete||0),total=Number(p.total||0),subtotal=Math.max(0,total-frete),data=new Date(p.criado_em),dataTexto=isNaN(data.getTime())?'':data.toLocaleString('pt-BR'),linhas=itens.map(i=>`<tr><td>${Number(i.quantidade||0)}x ${escaparHTML(i.nome||'Produto')}</td><td>${moeda(Number(i.preco_unitario||0)*Number(i.quantidade||0))}</td></tr>`).join(''),endereco=p.tipo_entrega==='retirada'?'Retirada na Feira da Lua':(p.endereco||'Não informado'),bairro=p.bairro?`<p><b>Bairro:</b> ${escaparHTML(p.bairro)}</p>`:'',titulo=formato==='80mm'?'Comprovante do pedido':'Comprovante de pedido';const janela=window.open('','_blank');if(!janela){alert('O navegador bloqueou a janela de impressão. Permita pop-ups para este site e tente novamente.');return}janela.document.open();janela.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${titulo} #${escaparHTML(p.id)}</title><style>@page{size:${formato==='80mm'?'80mm auto':'A4'};margin:${formato==='80mm'?'5mm':'15mm'}}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#111;margin:0;font-size:${formato==='80mm'?'12px':'14px'};width:${formato==='80mm'?'70mm':'100%'}}h1{font-size:${formato==='80mm'?'17px':'22px'};text-align:center;margin:0 0 5px}h2{font-size:15px;text-align:center;margin:4px 0 12px}.centro{text-align:center}.linha{border-top:1px dashed #777;margin:10px 0}p{margin:5px 0;line-height:1.35}table{width:100%;border-collapse:collapse;margin:8px 0}td{padding:5px 0;vertical-align:top}td:last-child{text-align:right;white-space:nowrap}.total{font-size:17px;font-weight:bold;text-align:right;margin-top:10px}.acoes{text-align:center;margin:15px 0}.acoes button{padding:10px 18px;font-size:14px}@media print{.acoes{display:none}}</style></head><body><h1>FEIRA DA LUA</h1><h2>${titulo}</h2><p><b>Pedido:</b> #${escaparHTML(p.id)}</p><p><b>Data:</b> ${escaparHTML(dataTexto)}</p><div class="linha"></div><p><b>Cliente:</b> ${escaparHTML(p.cliente_nome||'')}</p><p><b>Telefone:</b> ${escaparHTML(p.cliente_telefone||'')}</p><p><b>Recebimento:</b> ${escaparHTML(endereco)}</p>${bairro}<div class="linha"></div><b>Produtos</b><table>${linhas}</table><div class="linha"></div><p>Subtotal: ${moeda(subtotal)}</p><p>Frete: ${moeda(frete)}</p><p class="total">TOTAL: ${moeda(total)}</p><div class="linha"></div><p class="centro">Obrigado pela preferência!</p><p class="centro">Feira da Lua | Ribeirão Grande</p><div class="acoes"><button onclick="window.print()">Imprimir</button></div><script>window.onload=()=>setTimeout(()=>window.print(),350)<\/script></body></html>`);janela.document.close()}
-async function confirmarPedido(id){if(!confirm('Confirmar este pedido e dar baixa no estoque?'))return;const {error}=await banco.rpc('confirmar_pedido',{p_pedido_id:id});if(error){alert('Não foi possível confirmar: '+error.message);return}alert('Pedido confirmado e estoque atualizado!');await carregarPedidos();await carregarDados()}
-async function cancelarPedido(id){if(!confirm('Deseja cancelar este pedido? Se já foi confirmado, o estoque será devolvido.'))return;const {error}=await banco.rpc('cancelar_pedido',{p_pedido_id:id});if(error){alert('Não foi possível cancelar: '+error.message);return}alert('Pedido cancelado!');await carregarPedidos();await carregarDados()}
-async function atualizarStatus(id,status){const {error}=await banco.rpc('atualizar_status_pedido',{p_pedido_id:id,p_novo_status:status});if(error){alert('Erro ao atualizar pedido: '+error.message);return}alert('Pedido atualizado!');await carregarPedidos()}
-async function removerFoto(id,url){if(!confirm('Deseja excluir a foto deste produto?'))return;const caminho=obterCaminhoFoto(url);if(caminho){const {error}=await banco.storage.from(BUCKET).remove([caminho]);if(error){mensagem('Erro ao excluir foto: '+error.message);return}}const {error}=await banco.from('produtos').update({imagem_url:null}).eq('id',id);if(error){mensagem('Erro ao atualizar produto: '+error.message);return}mensagem('Foto excluída!');await carregarDados()}
-async function excluirProduto(id,nome){if(!confirm('Deseja retirar "'+nome+'" da vitrine?'))return;const {error}=await banco.from('produtos').update({ativo:false}).eq('id',id).eq('ativo',true);if(error){mensagem('Erro ao excluir: '+error.message);return}if(Number(editando)===Number(id))cancelarEdicao();mensagem('Produto retirado da vitrine!');await carregarDados()}
-function alterarTipoFrete(){const tipo=document.getElementById('tipoFrete').value,campo=document.getElementById('bairroFrete');if(tipo==='externo'){campo.value='Externo';campo.disabled=true;campo.placeholder='Externo'}else{campo.disabled=false;if(campo.value==='Externo')campo.value='';campo.placeholder='Digite o nome do bairro'}}
-async function carregarFretes(){const l=document.getElementById('listaFretes');l.textContent='Carregando bairros...';const {data,error}=await banco.from('frete_bairros').select('id,bairro,tipo,valor,ativo').order('tipo').order('bairro');if(error){l.textContent='Erro ao carregar fretes: '+error.message;return}fretes=data||[];l.innerHTML='';if(!fretes.length){l.textContent='Nenhum bairro cadastrado ainda.';return}fretes.forEach(f=>{const c=criarElemento('div',undefined,'frete');c.appendChild(criarElemento('h3',f.bairro));c.appendChild(criarElemento('p',f.tipo==='externo'?'Entrega externa':'Ribeirão Grande'));c.appendChild(criarElemento('h3',moeda(f.valor)));c.appendChild(criarElemento('p',f.ativo?'Cadastro ativo':'Cadastro desativado','status'));const e=criarElemento('button','Editar valor e cadastro','azul');e.onclick=()=>editarFrete(f.id);c.appendChild(e);const a=criarElemento('button',f.ativo?'Desativar bairro':'Ativar bairro',f.ativo?'excluir':'verde');a.onclick=()=>alternarFrete(f.id,f.ativo);c.appendChild(a);l.appendChild(c)})}
-async function salvarFrete(){const tipo=document.getElementById('tipoFrete').value,bairro=tipo==='externo'?'Externo':document.getElementById('bairroFrete').value.trim(),valorTexto=document.getElementById('valorFrete').value,valor=Number(valorTexto);if(!bairro){alert('Informe o nome do bairro.');return}if(valorTexto===''||!Number.isFinite(valor)||valor<0){alert('Informe um valor de frete válido.');return}const b=document.getElementById('salvarFrete');b.disabled=true;b.textContent='Salvando...';try{const dados={bairro,tipo,valor,ativo:true},r=freteEditando!==null?await banco.from('frete_bairros').update(dados).eq('id',freteEditando):await banco.from('frete_bairros').insert(dados);if(r.error)throw r.error;cancelarEdicaoFrete();document.getElementById('mensagemFrete').textContent='Frete salvo com sucesso!';await carregarFretes()}catch(e){document.getElementById('mensagemFrete').textContent='Não foi possível salvar: '+e.message}finally{b.disabled=false;b.textContent='Cadastrar frete'}}
-function editarFrete(id){const f=fretes.find(x=>Number(x.id)===Number(id));if(!f)return;freteEditando=f.id;document.getElementById('tipoFrete').value=f.tipo;document.getElementById('bairroFrete').value=f.bairro;document.getElementById('valorFrete').value=f.valor;alterarTipoFrete();document.getElementById('tituloFrete').textContent='Editar frete';document.getElementById('salvarFrete').textContent='Salvar alterações';document.getElementById('cancelarFrete').classList.remove('oculto');document.getElementById('tituloFrete').scrollIntoView({behavior:'smooth'})}
-function cancelarEdicaoFrete(){freteEditando=null;document.getElementById('tipoFrete').value='cidade';document.getElementById('bairroFrete').value='';document.getElementById('bairroFrete').disabled=false;document.getElementById('bairroFrete').placeholder='Digite o nome do bairro';document.getElementById('valorFrete').value='';document.getElementById('tituloFrete').textContent='Cadastrar bairro';document.getElementById('salvarFrete').textContent='Cadastrar frete';document.getElementById('cancelarFrete').classList.add('oculto')}
-async function alternarFrete(id,ativo){if(!confirm('Deseja '+(ativo?'desativar':'ativar')+' este cadastro de frete?'))return;const {error}=await banco.from('frete_bairros').update({ativo:!ativo}).eq('id',id);if(error){alert('Erro ao atualizar frete: '+error.message);return}await carregarFretes()}
-</script></body></html>
+
+let feirantes=[], produtos=[], editando=null, fotoSelecionada=null;
+let fretes=[], regioes=[], regiaoEditando=null, bairroEditando=null;
+
+/* NAVEGAÇÃO */
+function abrirArea(area){
+ document.getElementById('inicioAdmin').style.display='none';
+ document.querySelectorAll('.area-admin').forEach(el=>el.classList.remove('ativa'));
+ if(area==='pedidos'){document.getElementById('areaPedidos').classList.add('ativa');carregarPedidos();}
+ if(area==='loja'){document.getElementById('areaLoja').classList.add('ativa');carregarDados();}
+ if(area==='fretes'){document.getElementById('areaFretes').classList.add('ativa');carregarFretes();}
+  if(area==='senhas'){document.getElementById('areaSenhas').classList.add('ativa');}
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function voltarInicio(){
+ document.querySelectorAll('.area-admin').forEach(el=>el.classList.remove('ativa'));
+ document.getElementById('inicioAdmin').style.display='block';
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* RECUPERAÇÃO DE SENHA */
+function mostrarSomente(id){
+ ['login','areaRecuperacao','areaNovaSenha','painel'].forEach(nome=>{
+  const el=document.getElementById(nome);
+  if(el)el.classList.toggle('oculto',nome!==id);
+ });
+}
+function voltarLogin(){
+ mostrarSomente('login');
+ document.getElementById('mensagemLogin').textContent='';
+ document.getElementById('mensagemRecuperacao').textContent='';
+}
+function esqueciSenha(){
+ document.getElementById('emailRecuperacao').value=document.getElementById('email').value.trim();
+ document.getElementById('mensagemRecuperacao').textContent='';
+ mostrarSomente('areaRecuperacao');
+}
+async function enviarRecuperacao(){
+ const email=document.getElementById('emailRecuperacao').value.trim();
+ const mensagem=document.getElementById('mensagemRecuperacao');
+ const botao=document.getElementById('botaoEnviarRecuperacao');
+ if(!email){mensagem.textContent='Informe o e-mail cadastrado.';return;}
+ botao.disabled=true;botao.textContent='Enviando...';mensagem.textContent='';
+ try{
+  const redirectTo=window.location.origin+window.location.pathname;
+  const {error}=await banco.auth.resetPasswordForEmail(email,{redirectTo});
+  if(error)throw error;
+  mensagem.textContent='Solicitação enviada. Confira a caixa de entrada e a pasta de spam do e-mail informado.';
+ }catch(e){mensagem.textContent='Não foi possível enviar: '+(e.message||'erro desconhecido');}
+ finally{botao.disabled=false;botao.textContent='Enviar link de recuperação';}
+}
+async function salvarNovaSenha(){
+ const senha=document.getElementById('novaSenha').value;
+ const confirmacao=document.getElementById('confirmarNovaSenha').value;
+ const mensagem=document.getElementById('mensagemNovaSenha');
+ const botao=document.getElementById('botaoSalvarNovaSenha');
+
+ if(senha.length<6){
+  mensagem.textContent='A senha precisa ter pelo menos 6 caracteres.';
+  return;
+ }
+
+ if(senha!==confirmacao){
+  mensagem.textContent='As senhas não são iguais.';
+  return;
+ }
+
+ botao.disabled=true;
+ botao.textContent='Salvando...';
+ mensagem.textContent='';
+
+ try{
+  const {data,error:erroSessao}=await banco.auth.getSession();
+
+  if(erroSessao) throw erroSessao;
+
+  if(!data.session){
+   throw new Error('Sua sessão de recuperação não foi encontrada. Solicite um novo link de recuperação.');
+  }
+
+  const {error}=await banco.auth.updateUser({
+   password:senha
+  });
+
+  if(error) throw error;
+
+  await banco.auth.signOut();
+
+  document.getElementById('novaSenha').value='';
+  document.getElementById('confirmarNovaSenha').value='';
+  document.getElementById('senha').value='';
+
+  mostrarSomente('login');
+
+  document.getElementById('mensagemLogin').textContent=
+   'Senha alterada com sucesso! Entre com sua nova senha.';
+
+ }catch(e){
+  mensagem.textContent='Não foi possível alterar a senha: '+(e.message||'erro desconhecido');
+ }finally{
+  botao.disabled=false;
+  botao.textContent='Salvar nova senha';
+ }
+}
+/* REDEFINIR SENHA DE CLIENTE PELO PAINEL ADMINISTRATIVO */
+async function redefinirSenhaCliente(){
+ const telefone=document.getElementById('telefoneResetCliente').value.trim();
+ const novaSenha=document.getElementById('novaSenhaCliente').value;
+ const confirmar=document.getElementById('confirmarSenhaCliente').value;
+ const mensagem=document.getElementById('mensagemResetCliente');
+ const botao=document.getElementById('botaoRedefinirCliente');
+
+ const numeros=telefone.replace(/\\D/g,'');
+ if(numeros.length<10||numeros.length>13){
+  mensagem.textContent='Informe o celular cadastrado com DDD.';
+  return;
+ }
+ if(novaSenha.length<8){
+  mensagem.textContent='A nova senha precisa ter pelo menos 8 caracteres.';
+  return;
+ }
+ if(novaSenha.length>128){
+  mensagem.textContent='A nova senha é muito longa.';
+  return;
+ }
+ if(novaSenha!==confirmar){
+  mensagem.textContent='As senhas não são iguais.';
+  return;
+ }
+ if(!confirm('Confirma a redefinição da senha deste cliente? As sessões antigas serão encerradas.'))return;
+
+ botao.disabled=true;
+ botao.textContent='Redefinindo...';
+ mensagem.textContent='';
+ try{
+  const {data,error}=await banco.auth.getSession();
+  if(error)throw error;
+  const token=data.session?.access_token;
+  if(!token)throw new Error('Sua sessão administrativa expirou. Entre novamente no painel.');
+
+  const resposta=await fetch(SUPABASE_URL+'/functions/v1/cliente-auth',{
+   method:'POST',
+   headers:{
+    'Content-Type':'application/json',
+    'apikey':SUPABASE_KEY,
+    'Authorization':'Bearer '+token
+   },
+   body:JSON.stringify({
+    acao:'admin_reset_password',
+    telefone,
+    nova_senha:novaSenha
+   })
+  });
+  const resultado=await resposta.json().catch(()=>({}));
+  if(!resposta.ok)throw new Error(resultado.erro||resultado.mensagem||'Não foi possível redefinir a senha.');
+
+  document.getElementById('novaSenhaCliente').value='';
+  document.getElementById('confirmarSenhaCliente').value='';
+  mensagem.textContent=(resultado.mensagem||'Senha redefinida com sucesso.')+' Informe a nova senha ao cliente por um canal privado.';
+ }catch(e){
+  mensagem.textContent='Erro: '+(e.message||'Não foi possível redefinir a senha.');
+ }finally{
+  botao.disabled=false;
+  botao.textContent='Redefinir senha do cliente';
+ }
+}
+
+/* LOGIN */
+async function entrar(){
+ const email=document.getElementById('email').value.trim();
+ const senha=document.getElementById('senha').value;
+ const aviso=document.getElementById('mensagemLogin');
+
+ if(!email||!senha){
+  aviso.textContent='Informe seu e-mail e senha.';
+  return;
+ }
+
+ aviso.textContent='Verificando acesso...';
+
+ try{
+  const {data,error}=await banco.auth.signInWithPassword({
+   email,
+   password:senha
+  });
+
+  if(error){
+   aviso.textContent='Erro no login: '+error.message;
+   return;
+  }
+
+  if(!data.session?.access_token || !data.session?.refresh_token){
+   aviso.textContent='O login foi aceito, mas a sessão não foi recebida. Atualize a página e tente novamente.';
+   return;
+  }
+
+  // Garante que o cliente Supabase mantenha a sessão antes de consultar admins.
+  const {error:erroSessao}=await banco.auth.setSession({
+   access_token:data.session.access_token,
+   refresh_token:data.session.refresh_token
+  });
+  if(erroSessao) throw erroSessao;
+
+  const {data:sessaoAtual,error:erroGetSessao}=await banco.auth.getSession();
+  if(erroGetSessao) throw erroGetSessao;
+  if(!sessaoAtual.session?.access_token || sessaoAtual.session.user.id!==data.user.id){
+   aviso.textContent='Não foi possível confirmar sua sessão administrativa. Entre novamente.';
+   return;
+  }
+
+  console.log('USUÁRIO AUTENTICADO:',sessaoAtual.session.user.id);
+  console.log('SESSÃO CONFIRMADA:',!!sessaoAtual.session.access_token);
+
+  const {data:admin,error:erroAdmin}=await banco
+   .from('admins')
+   .select('user_id')
+   .eq('user_id',sessaoAtual.session.user.id)
+   .maybeSingle();
+
+  console.log('RESULTADO ADMIN:',admin);
+  console.log('ERRO ADMIN:',erroAdmin);
+
+  if(erroAdmin){
+   aviso.textContent='Erro ao consultar administrador: '+erroAdmin.message;
+   return;
+  }
+
+  if(!admin){
+   aviso.textContent='Usuário autenticado, mas não encontrado na tabela admins.';
+   return;
+  }
+
+  mostrarSomente('painel');
+  document.getElementById('usuario').textContent='Acesso liberado: '+email;
+  voltarInicio();
+
+ }catch(e){
+  console.error('ERRO NO LOGIN:',e);
+  aviso.textContent='Erro inesperado: '+e.message;
+ }
+}
+
+
+async function sair(){await banco.auth.signOut();location.reload();}
+
+
+/* RECUPERAÇÃO DE SENHA: RETORNO DO LINK DO SUPABASE */
+
+function abrirTelaNovaSenha(){
+ document.getElementById('mensagemNovaSenha').textContent='';
+ document.getElementById('novaSenha').value='';
+ document.getElementById('confirmarNovaSenha').value='';
+ mostrarSomente('areaNovaSenha');
+}
+
+banco.auth.onAuthStateChange((evento, session)=>{
+ if(evento==='PASSWORD_RECOVERY' && session?.access_token){
+  abrirTelaNovaSenha();
+ }
+});
+
+/* Verifica o retorno do link de recuperação */
+(async function verificarRetornoRecuperacao(){
+ const hash=window.location.hash || '';
+ const parametros=new URLSearchParams(hash.replace(/^#/,''));
+
+ const tipo=parametros.get('type');
+ const erro=parametros.get('error_description') || parametros.get('error');
+
+ if(erro){
+  mostrarSomente('login');
+  document.getElementById('mensagemLogin').textContent=
+   'O link de recuperação apresentou um erro ou expirou. Solicite um novo e-mail.';
+  return;
+ }
+
+ if(tipo!=='recovery') return;
+
+ const {data,error}=await banco.auth.getSession();
+
+ if(error){
+  mostrarSomente('login');
+  document.getElementById('mensagemLogin').textContent=
+   'Erro ao validar o link: '+error.message;
+  return;
+ }
+
+ if(data.session?.access_token){
+  abrirTelaNovaSenha();
+ }else{
+  mostrarSomente('login');
+  document.getElementById('mensagemLogin').textContent=
+   'Não foi possível validar o link. Solicite um novo e-mail de recuperação.';
+ }
+})();
+
+
+/* FOTO */
+document.getElementById('fotoProduto').addEventListener('change',function(){
+ const arquivo=this.files[0], preview=document.getElementById('preview');
+ fotoSelecionada=arquivo||null;
+ if(!arquivo){preview.src='';preview.classList.add('oculto');return;}
+ if(!['image/jpeg','image/png','image/webp'].includes(arquivo.type)||arquivo.size>5*1024*1024){
+  alert('Escolha uma foto JPG, PNG ou WEBP de até 5 MB.');
+  this.value='';fotoSelecionada=null;preview.classList.add('oculto');return;
+ }
+ preview.src=URL.createObjectURL(arquivo);preview.classList.remove('oculto');
+});
+
+/* AUXILIARES */
+function mensagem(texto){document.getElementById('mensagem').textContent=texto;}
+function moeda(valor){return Number(valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+function criarElemento(tag,texto,classe){
+ const el=document.createElement(tag);
+ if(texto!==undefined)el.textContent=texto;
+ if(classe)el.className=classe;
+ return el;
+}
+
+/* FRETES E REGIÕES */
+async function carregarFretes(){
+ const lista=document.getElementById('listaRegioes');lista.textContent='Carregando regiões...';
+ const [resultadoRegioes,resultadoFretes]=await Promise.all([
+  banco.from('frete_regioes').select('id,nome,tipo,valor,ativo').eq('tipo','cidade').order('nome'),
+  banco.from('frete_bairros').select('id,bairro,tipo,valor,ativo,regiao_id').order('bairro')
+ ]);
+ if(resultadoRegioes.error){lista.textContent='Erro ao carregar regiões: '+resultadoRegioes.error.message;return;}
+ if(resultadoFretes.error){lista.textContent='Erro ao carregar bairros: '+resultadoFretes.error.message;return;}
+ regioes=resultadoRegioes.data||[];fretes=resultadoFretes.data||[];
+ atualizarSelectRegioes();mostrarRegioes();mostrarBairrosSemRegiao();mostrarFreteExterno();
+}
+function atualizarSelectRegioes(){
+ const select=document.getElementById('regiaoBairro'),anterior=select.value;
+ select.innerHTML='<option value="">Selecione a região</option>';
+ regioes.forEach(r=>{if(!r.ativo)return;const op=document.createElement('option');op.value=r.id;op.textContent=r.nome+' - '+moeda(r.valor);select.appendChild(op);});
+ if(regioes.some(r=>String(r.id)===anterior&&r.ativo))select.value=anterior;
+}
+function mostrarRegioes(){
+ const lista=document.getElementById('listaRegioes');lista.innerHTML='';
+ if(!regioes.length){lista.textContent='Nenhuma região cadastrada.';return;}
+ regioes.forEach(r=>{
+  const card=criarElemento('div',undefined,'regiao-card');
+  card.appendChild(criarElemento('h3',r.nome));
+  card.appendChild(criarElemento('p','Frete da região: '+moeda(r.valor),'valor-frete'));
+  const bairrosDaRegiao=fretes.filter(f=>f.tipo==='cidade'&&Number(f.regiao_id)===Number(r.id));
+  card.appendChild(criarElemento('p','Bairros vinculados: '+bairrosDaRegiao.length,'pequeno'));
+  if(!bairrosDaRegiao.length)card.appendChild(criarElemento('p','Nenhum bairro vinculado ainda.','pequeno'));
+  bairrosDaRegiao.forEach(b=>{
+   const linha=criarElemento('div',undefined,'bairro-card');
+   linha.appendChild(criarElemento('strong',b.bairro));linha.appendChild(criarElemento('p','Frete: '+moeda(b.valor)));
+   const editar=criarElemento('button','Editar bairro','azul');editar.classList.add('botao-pequeno');editar.onclick=()=>editarBairro(b.id);
+   const alternar=criarElemento('button',b.ativo?'Desativar bairro':'Ativar bairro',b.ativo?'excluir':'verde');alternar.classList.add('botao-pequeno');alternar.onclick=()=>alternarBairro(b.id,b.ativo);
+   linha.append(editar,alternar);card.appendChild(linha);
+  });
+  const editarRegiao=criarElemento('button','Editar região e valor','azul');editarRegiao.onclick=()=>editarRegiaoFunc(r.id);card.appendChild(editarRegiao);
+  lista.appendChild(card);
+ });
+}
+function mostrarBairrosSemRegiao(){
+ const lista=document.getElementById('listaBairrosSemRegiao');lista.innerHTML='';
+ const semRegiao=fretes.filter(f=>f.tipo==='cidade'&&f.regiao_id===null);
+ if(!semRegiao.length){lista.textContent='Todos os bairros estão vinculados a uma região.';return;}
+ semRegiao.forEach(b=>{
+  const card=criarElemento('div',undefined,'frete-item');card.appendChild(criarElemento('h3',b.bairro));card.appendChild(criarElemento('p','Frete atual: '+moeda(b.valor),'valor-frete'));
+  const editar=criarElemento('button','Editar e vincular a uma região','azul');editar.onclick=()=>editarBairro(b.id);
+  const alternar=criarElemento('button',b.ativo?'Desativar bairro':'Ativar bairro',b.ativo?'excluir':'verde');alternar.onclick=()=>alternarBairro(b.id,b.ativo);
+  card.append(editar,alternar);lista.appendChild(card);
+ });
+}
+function mostrarFreteExterno(){
+ const lista=document.getElementById('listaFreteExterno');lista.innerHTML='';
+ const externo=fretes.find(f=>f.tipo==='externo');
+ if(!externo){lista.textContent='Nenhum frete externo cadastrado.';return;}
+ document.getElementById('valorExterno').value=externo.valor;
+ const card=criarElemento('div',undefined,'frete-item');card.appendChild(criarElemento('h3','Entrega externa'));card.appendChild(criarElemento('p','Valor: '+moeda(externo.valor),'valor-frete'));card.appendChild(criarElemento('p',externo.ativo?'Frete ativo':'Frete desativado','pequeno'));
+ const alternar=criarElemento('button',externo.ativo?'Desativar frete externo':'Ativar frete externo',externo.ativo?'excluir':'verde');alternar.onclick=()=>alternarBairro(externo.id,externo.ativo);lista.appendChild(card);
+}
+
+/* CADASTRAR E EDITAR REGIÃO */
+async function salvarRegiao(){
+ const nome=document.getElementById('nomeRegiao').value.trim(),valorTexto=document.getElementById('valorRegiao').value,valor=Number(valorTexto);
+ if(nome.length<2){alert('Informe o nome da região.');return;}
+ if(valorTexto===''||!Number.isFinite(valor)||valor<0){alert('Informe um valor de frete válido.');return;}
+ const botao=document.getElementById('botaoSalvarRegiao');botao.disabled=true;botao.textContent='Salvando...';
+ try{
+  let idRegiao=regiaoEditando;
+  if(regiaoEditando!==null){
+   const {error}=await banco.from('frete_regioes').update({nome,valor}).eq('id',regiaoEditando);if(error)throw error;
+  }else{
+   const {data,error}=await banco.from('frete_regioes').insert({nome,tipo:'cidade',valor,ativo:true}).select('id').single();if(error)throw error;idRegiao=data.id;
+  }
+  const {error:erroBairros}=await banco.from('frete_bairros').update({valor}).eq('regiao_id',idRegiao).eq('tipo','cidade');
+  if(erroBairros)throw new Error('A região foi salva, mas não foi possível atualizar os fretes dos bairros vinculados: '+erroBairros.message);
+  cancelarEdicaoRegiao();document.getElementById('mensagemRegiao').textContent='Região salva. Fretes dos bairros vinculados atualizados!';await carregarFretes();
+ }catch(e){document.getElementById('mensagemRegiao').textContent='Erro: '+e.message;}
+ finally{botao.disabled=false;botao.textContent=regiaoEditando!==null?'Salvar alterações':'Cadastrar região';}
+}
+function editarRegiaoFunc(id){
+ const r=regioes.find(x=>Number(x.id)===Number(id));if(!r)return;
+ regiaoEditando=r.id;document.getElementById('nomeRegiao').value=r.nome;document.getElementById('valorRegiao').value=r.valor;
+ document.getElementById('tituloRegiao').textContent='Editar região';document.getElementById('botaoSalvarRegiao').textContent='Salvar alterações';document.getElementById('botaoCancelarRegiao').classList.remove('oculto');
+ document.getElementById('tituloRegiao').scrollIntoView({behavior:'smooth'});
+}
+function cancelarEdicaoRegiao(){
+ regiaoEditando=null;document.getElementById('nomeRegiao').value='';document.getElementById('valorRegiao').value='';
+ document.getElementById('tituloRegiao').textContent='Cadastrar região';document.getElementById('botaoSalvarRegiao').textContent='Cadastrar região';document.getElementById('botaoCancelarRegiao').classList.add('oculto');
+}
+
+/* CADASTRAR E EDITAR BAIRRO */
+async function salvarBairro(){
+ const regiaoId=document.getElementById('regiaoBairro').value,bairro=document.getElementById('nomeBairro').value.trim();
+ if(!regiaoId){alert('Selecione uma região.');return;}if(bairro.length<2){alert('Informe o nome do bairro.');return;}
+ const regiao=regioes.find(r=>String(r.id)===String(regiaoId));if(!regiao){alert('Região não encontrada. Atualize a tela.');return;}
+ const botao=document.getElementById('botaoSalvarBairro');botao.disabled=true;botao.textContent='Salvando...';
+ try{
+  const dados={bairro,tipo:'cidade',valor:Number(regiao.valor),ativo:true,regiao_id:Number(regiaoId)};
+  let resultado;
+  if(bairroEditando!==null)resultado=await banco.from('frete_bairros').update(dados).eq('id',bairroEditando);
+  else resultado=await banco.from('frete_bairros').insert(dados);
+  if(resultado.error)throw resultado.error;
+  cancelarEdicaoBairro();document.getElementById('mensagemBairro').textContent='Bairro salvo e vinculado à região!';await carregarFretes();
+ }catch(e){document.getElementById('mensagemBairro').textContent='Erro ao salvar bairro: '+e.message;}
+ finally{botao.disabled=false;botao.textContent=bairroEditando!==null?'Salvar alterações':'Cadastrar bairro';}
+}
+function editarBairro(id){
+ const b=fretes.find(x=>Number(x.id)===Number(id));if(!b)return;
+ if(b.tipo==='externo'){alert('O frete externo é administrado no campo próprio.');return;}
+ bairroEditando=b.id;document.getElementById('nomeBairro').value=b.bairro;document.getElementById('regiaoBairro').value=b.regiao_id||'';
+ document.getElementById('botaoSalvarBairro').textContent='Salvar alterações';document.getElementById('botaoCancelarBairro').classList.remove('oculto');
+ document.getElementById('nomeBairro').scrollIntoView({behavior:'smooth'});
+}
+function cancelarEdicaoBairro(){
+ bairroEditando=null;document.getElementById('nomeBairro').value='';document.getElementById('regiaoBairro').value='';
+ document.getElementById('botaoSalvarBairro').textContent='Cadastrar bairro';document.getElementById('botaoCancelarBairro').classList.add('oculto');
+}
+
+/* FRETE EXTERNO */
+async function salvarFreteExterno(){
+ const texto=document.getElementById('valorExterno').value,valor=Number(texto);
+ if(texto===''||!Number.isFinite(valor)||valor<0){alert('Informe um valor válido para o frete externo.');return;}
+ const existente=fretes.find(f=>f.tipo==='externo');
+ const botao=document.querySelector('#areaFretes .card:nth-of-type(3) button');botao.disabled=true;botao.textContent='Salvando...';
+ try{
+  let resultado;
+  if(existente)resultado=await banco.from('frete_bairros').update({valor,ativo:true,bairro:'Externo'}).eq('id',existente.id);
+  else resultado=await banco.from('frete_bairros').insert({bairro:'Externo',tipo:'externo',valor,ativo:true,regiao_id:null});
+  if(resultado.error)throw resultado.error;
+  document.getElementById('mensagemExterno').textContent='Frete externo salvo com sucesso!';await carregarFretes();
+ }catch(e){document.getElementById('mensagemExterno').textContent='Erro ao salvar: '+e.message;}
+ finally{botao.disabled=false;botao.textContent='Salvar frete externo';}
+}
+async function alternarBairro(id,ativo){
+ const acao=ativo?'desativar':'ativar';if(!confirm('Deseja '+acao+' este cadastro?'))return;
+ const {error}=await banco.from('frete_bairros').update({ativo:!ativo}).eq('id',id);
+ if(error){alert('Erro ao atualizar: '+error.message);return;}await carregarFretes();
+}
+
+/* CARREGAR BARRACAS E PRODUTOS */
+async function carregarDados(){
+ const [f,p]=await Promise.all([
+  banco.from('feirantes').select('id,nome,responsavel').order('nome'),
+  banco.from('produtos').select('id,feirante_id,nome,preco,descricao,imagem_url,estoque,estoque_minimo').eq('ativo',true).order('nome')
+ ]);
+ if(f.error||p.error){mensagem('Erro ao carregar dados: '+(f.error?.message||p.error?.message));return;}
+ feirantes=f.data||[];produtos=p.data||[];
+ const select=document.getElementById('feiranteProduto');select.innerHTML='<option value="">Selecione a barraca</option>';
+ feirantes.forEach(f=>{const op=document.createElement('option');op.value=f.id;op.textContent=f.nome;select.appendChild(op);});
+ const filtro=document.getElementById('filtroBarraca'),valorAnterior=filtro.value;filtro.innerHTML='<option value="">Todas as barracas</option>';
+ feirantes.forEach(f=>{const op=document.createElement('option');op.value=f.id;op.textContent=f.nome;filtro.appendChild(op);});
+ if(feirantes.some(f=>String(f.id)===valorAnterior))filtro.value=valorAnterior;
+ mostrarProdutos();
+}
+async function cadastrarFeirante(){
+ const nome=document.getElementById('nomeFeirante').value.trim(),responsavel=document.getElementById('responsavel').value.trim();
+ if(!nome){alert('Informe o nome da barraca.');return;}
+ const {error}=await banco.from('feirantes').insert({nome,responsavel,ativo:true});
+ if(error){mensagem('Erro: '+error.message);return;}
+ document.getElementById('nomeFeirante').value='';document.getElementById('responsavel').value='';mensagem('Barraca cadastrada com sucesso!');await carregarDados();
+}
+
+/* SALVAR PRODUTO */
+async function salvarProduto(){
+ const feirante_id=document.getElementById('feiranteProduto').value,nome=document.getElementById('nomeProduto').value.trim();
+ const descricao=document.getElementById('descricaoProduto').value.trim(),preco=Number(document.getElementById('precoProduto').value);
+ const estoque=Number(document.getElementById('estoqueProduto').value),estoque_minimo=Number(document.getElementById('minimoProduto').value);
+ if(!feirante_id||!nome||!Number.isFinite(preco)||preco<=0){alert('Preencha a barraca, o nome e o preço.');return;}
+ if(!Number.isInteger(estoque)||estoque<0||!Number.isInteger(estoque_minimo)||estoque_minimo<0){alert('Informe quantidades inteiras e não negativas para o estoque.');return;}
+ const botao=document.getElementById('salvar');botao.disabled=true;botao.textContent='Salvando...';
+ try{
+  const id=editando;let fotoAntiga=null;
+  const dados={feirante_id:Number(feirante_id),nome,descricao,preco,estoque,estoque_minimo};
+  if(editando!==null){
+   const atual=produtos.find(p=>Number(p.id)===Number(editando));fotoAntiga=atual?.imagem_url||null;
+   const {error}=await banco.from('produtos').update(dados).eq('id',editando).eq('ativo',true);if(error)throw error;
+  }else{
+   const {data,error}=await banco.from('produtos').insert({...dados,ativo:true}).select('id').single();if(error)throw error;dados.id=data.id;
+  }
+  const idProduto=editando!==null?id:dados.id;
+  if(fotoSelecionada)await enviarFoto(idProduto,fotoSelecionada,fotoAntiga);
+  cancelarEdicao();mensagem('Produto salvo com sucesso!');await carregarDados();
+ }catch(e){mensagem('Erro ao salvar: '+e.message);}
+ finally{botao.disabled=false;botao.textContent=editando!==null?'Salvar alterações':'Cadastrar produto';}
+}
+async function enviarFoto(id,arquivo,fotoAntiga){
+ const extensao=arquivo.name.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+ const caminho=id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+extensao;
+ const {error}=await banco.storage.from(BUCKET).upload(caminho,arquivo,{cacheControl:'3600',upsert:false,contentType:arquivo.type});
+ if(error)throw error;
+ const {data}=banco.storage.from(BUCKET).getPublicUrl(caminho);
+ const {error:erroBanco}=await banco.from('produtos').update({imagem_url:data.publicUrl}).eq('id',id);
+ if(erroBanco){await banco.storage.from(BUCKET).remove([caminho]);throw erroBanco;}
+ if(fotoAntiga){const caminhoAntigo=obterCaminhoFoto(fotoAntiga);if(caminhoAntigo)await banco.storage.from(BUCKET).remove([caminhoAntigo]);}
+}
+function obterCaminhoFoto(url){
+ const marcador='/storage/v1/object/public/'+BUCKET+'/',pos=url.indexOf(marcador);
+ return pos<0?null:decodeURIComponent(url.substring(pos+marcador.length));
+}
+function editarProduto(id){
+ const p=produtos.find(x=>Number(x.id)===Number(id));if(!p)return;
+ editando=p.id;fotoSelecionada=null;
+ document.getElementById('feiranteProduto').value=p.feirante_id;document.getElementById('nomeProduto').value=p.nome;
+ document.getElementById('descricaoProduto').value=p.descricao||'';document.getElementById('precoProduto').value=p.preco;
+ document.getElementById('estoqueProduto').value=p.estoque??0;document.getElementById('minimoProduto').value=p.estoque_minimo??3;
+ document.getElementById('fotoProduto').value='';
+ const preview=document.getElementById('preview');
+ if(p.imagem_url){preview.src=p.imagem_url;preview.classList.remove('oculto');}else{preview.src='';preview.classList.add('oculto');}
+ document.getElementById('tituloProduto').textContent='Editar produto';document.getElementById('salvar').textContent='Salvar alterações';
+ document.getElementById('cancelar').classList.remove('oculto');document.getElementById('tituloProduto').scrollIntoView({behavior:'smooth'});
+}
+function cancelarEdicao(){
+ editando=null;fotoSelecionada=null;
+ document.getElementById('feiranteProduto').value='';document.getElementById('nomeProduto').value='';
+ document.getElementById('descricaoProduto').value='';document.getElementById('precoProduto').value='';
+ document.getElementById('estoqueProduto').value=0;document.getElementById('minimoProduto').value=3;
+ document.getElementById('fotoProduto').value='';document.getElementById('preview').src='';
+ document.getElementById('preview').classList.add('oculto');document.getElementById('tituloProduto').textContent='Cadastrar produto';
+ document.getElementById('salvar').textContent='Cadastrar produto';document.getElementById('cancelar').classList.add('oculto');
+}
+
+/* MOSTRAR PRODUTOS */
+function mostrarProdutos(){
+ const termo=document.getElementById('pesquisa').value.trim().toLowerCase(),barracaSelecionada=document.getElementById('filtroBarraca').value;
+ const lista=document.getElementById('lista');lista.innerHTML='';
+ const encontrados=produtos.filter(p=>{
+  const barraca=feirantes.find(f=>Number(f.id)===Number(p.feirante_id));
+  const combinaPesquisa=p.nome.toLowerCase().includes(termo)||(barraca?.nome||'').toLowerCase().includes(termo);
+  const combinaBarraca=!barracaSelecionada||String(p.feirante_id)===String(barracaSelecionada);
+  return combinaPesquisa&&combinaBarraca;
+ });
+ if(!encontrados.length){lista.textContent='Nenhum produto encontrado nesta barraca.';return;}
+ encontrados.forEach(p=>{
+  const barraca=feirantes.find(f=>Number(f.id)===Number(p.feirante_id)),card=criarElemento('div',undefined,'produto');
+  card.appendChild(criarElemento('h3',p.nome));card.appendChild(criarElemento('p','Barraca: '+(barraca?.nome||'Não identificada')));
+  card.appendChild(criarElemento('p',moeda(p.preco)));
+  const quantidade=Number(p.estoque||0),minimo=Number(p.estoque_minimo||0);
+  let textoEstoque='Estoque: '+quantidade+' unidade(s)';if(quantidade===0)textoEstoque+=' | ESGOTADO';else if(quantidade<=minimo)textoEstoque+=' | ÚLTIMAS UNIDADES';
+  card.appendChild(criarElemento('p',textoEstoque,'detalhe'));card.appendChild(criarElemento('p','Aviso de estoque mínimo: '+minimo,'pequeno'));
+  if(p.imagem_url){
+   const img=document.createElement('img');img.src=p.imagem_url;img.className='foto';img.alt=p.nome;card.appendChild(img);
+   const excluirFoto=criarElemento('button','Excluir foto','excluir');excluirFoto.onclick=()=>removerFoto(p.id,p.imagem_url);card.appendChild(excluirFoto);
+  }else card.appendChild(criarElemento('p','Produto sem foto.'));
+  const editar=criarElemento('button','Editar produto');editar.onclick=()=>editarProduto(p.id);
+  const excluir=criarElemento('button','Retirar da vitrine','excluir');excluir.onclick=()=>excluirProduto(p.id,p.nome);
+  card.append(editar,excluir);lista.appendChild(card);
+ });
+}
+
+/* CARREGAR PEDIDOS */
+async function carregarPedidos(){
+ const lista=document.getElementById('listaPedidos');lista.textContent='Carregando pedidos...';
+ const {data,error}=await banco.from('pedidos').select('id,cliente_nome,cliente_telefone,tipo_entrega,endereco,bairro,frete,itens,total,status,criado_em').order('criado_em',{ascending:false}).limit(100);
+ if(error){lista.textContent='Erro ao carregar pedidos: '+error.message;return;}
+ lista.innerHTML='';
+ if(!data||!data.length){lista.textContent='Nenhum pedido recebido até agora.';return;}
+ data.forEach(p=>mostrarPedido(p,lista));
+}
+function mostrarPedido(p,lista){
+ const card=criarElemento('div',undefined,'pedido');
+ card.appendChild(criarElemento('h3','Pedido #'+p.id));card.appendChild(criarElemento('span',String(p.status||'').toUpperCase(),'status'));
+ card.appendChild(criarElemento('p','Cliente: '+(p.cliente_nome||'')));card.appendChild(criarElemento('p','Telefone: '+(p.cliente_telefone||'')));
+ const entrega=p.tipo_entrega==='retirada'?'Retirada (pedido antigo)':'Entrega no endereço: '+(p.endereco||'Não informado');
+ card.appendChild(criarElemento('p',entrega));
+ if(p.tipo_entrega!=='retirada'){card.appendChild(criarElemento('p','Bairro: '+(p.bairro||'Não informado')));card.appendChild(criarElemento('p','Frete: '+moeda(p.frete)));}
+ const data=new Date(p.criado_em);card.appendChild(criarElemento('p','Recebido: '+data.toLocaleString('pt-BR'),'pequeno'));
+ card.appendChild(criarElemento('div','Produtos','linha'));
+ if(Array.isArray(p.itens))p.itens.forEach(item=>{const nome=item.nome||'Produto',qtd=Number(item.quantidade||0),preco=Number(item.preco_unitario||0);card.appendChild(criarElemento('p',qtd+' x '+nome+' | '+moeda(preco*qtd)));});
+ card.appendChild(criarElemento('h3','Total: '+moeda(p.total)));
+ if(p.status==='novo'){const confirmar=criarElemento('button','Confirmar pedido','verde');confirmar.onclick=()=>confirmarPedido(p.id);card.appendChild(confirmar);}
+ if(['confirmado','em_preparo','saiu_entrega'].includes(p.status)){
+  const avisar=criarElemento('button','Avisar cliente pelo WhatsApp','verde');
+  avisar.onclick=()=>avisarClienteWhatsApp(p);
+  card.appendChild(avisar);
+  const etapas={confirmado:{proximo:'em_preparo',texto:'Iniciar preparo'},em_preparo:{proximo:'saiu_entrega',texto:'Saiu para entrega'},saiu_entrega:{proximo:'concluido',texto:'Concluir pedido'}};
+  const etapa=etapas[p.status],avancar=criarElemento('button',etapa.texto,'azul');avancar.onclick=()=>atualizarStatus(p.id,etapa.proximo);card.appendChild(avancar);
+ }
+ if(['novo','confirmado','em_preparo','saiu_entrega'].includes(p.status)){const cancelar=criarElemento('button','Cancelar pedido','excluir');cancelar.onclick=()=>cancelarPedido(p.id);card.appendChild(cancelar);}
+ lista.appendChild(card);
+}
+function avisarClienteWhatsApp(p){
+ let telefone=String(p.cliente_telefone||'').replace(/\D/g,'');
+ if(telefone.startsWith('0'))telefone=telefone.replace(/^0+/, '');
+ if(telefone.length===10||telefone.length===11)telefone='55'+telefone;
+ if(!telefone||telefone.length<12||telefone.length>13){
+  alert('O telefone deste cliente está incompleto ou inválido. Confira o cadastro antes de enviar a mensagem.');
+  return;
+ }
+ const nome=(p.cliente_nome||'cliente').trim().split(' ')[0];
+ const entrega=p.tipo_entrega==='retirada'
+  ? 'Este é um pedido antigo, registrado para retirada na Feira da Lua.'
+  : 'Seu pedido foi confirmado e seguirá para preparação e entrega no endereço informado.';
+ const mensagem='Olá, '+nome+'! Seu pedido #'+p.id+' na Feira da Lua foi confirmado. '+entrega+' Total do pedido: '+moeda(p.total)+'. Obrigado por comprar na Feira da Lua e valorizar nossos feirantes de Ribeirão Grande!';
+ const url='https://wa.me/'+telefone+'?text='+encodeURIComponent(mensagem);
+ window.open(url,'_blank','noopener,noreferrer');
+}
+
+async function confirmarPedido(id){
+ if(!confirm('Confirmar este pedido e dar baixa no estoque?'))return;
+ const {error}=await banco.rpc('confirmar_pedido',{p_pedido_id:id});
+ if(error){alert('Não foi possível confirmar: '+error.message);return;}
+ alert('Pedido confirmado e estoque atualizado! Agora você pode avisar o cliente pelo WhatsApp.');
+ await carregarPedidos();
+ await carregarDados();
+}
+async function cancelarPedido(id){
+ if(!confirm('Deseja cancelar este pedido? Se já foi confirmado, o estoque será devolvido.'))return;
+ const {error}=await banco.rpc('cancelar_pedido',{p_pedido_id:id});
+ if(error){alert('Não foi possível cancelar: '+error.message);return;}
+ alert('Pedido cancelado!');await carregarPedidos();await carregarDados();
+}
+async function atualizarStatus(id,status){
+ const {error}=await banco.rpc('atualizar_status_pedido',{p_pedido_id:id,p_novo_status:status});
+ if(error){alert('Erro ao atualizar pedido: '+error.message);return;}
+ alert('Pedido atualizado!');await carregarPedidos();
+}
+async function removerFoto(id,url){
+ if(!confirm('Deseja excluir a foto deste produto?'))return;
+ const caminho=obterCaminhoFoto(url);
+ if(caminho){const {error}=await banco.storage.from(BUCKET).remove([caminho]);if(error){mensagem('Erro ao excluir foto: '+error.message);return;}}
+ const {error}=await banco.from('produtos').update({imagem_url:null}).eq('id',id);
+ if(error){mensagem('Erro ao atualizar produto: '+error.message);return;}
+ mensagem('Foto excluída!');await carregarDados();
+}
+async function excluirProduto(id,nome){
+ if(!confirm('Deseja retirar "'+nome+'" da vitrine?'))return;
+ const {error}=await banco.from('produtos').update({ativo:false}).eq('id',id).eq('ativo',true);
+ if(error){mensagem('Erro ao excluir: '+error.message);return;}
+ if(Number(editando)===Number(id))cancelarEdicao();
+ mensagem('Produto retirado da vitrine!');await carregarDados();
+}
+</script>
+</body>
+</html>
