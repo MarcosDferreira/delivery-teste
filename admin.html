@@ -40,6 +40,47 @@ footer{text-align:center;padding:20px}
 .bairro-card{background:#f2f5fa;padding:10px;border-radius:8px;margin:9px 0}
 .botao-pequeno{padding:9px;font-size:14px}
 </style>
+
+<style id="padrao-visual-responsivo">
+/* Padrão visual responsivo Feira da Lua */
+:root{--azul:#153b70;--azul-escuro:#07152f;--azul-claro:#2464a5;--dourado:#f4c95d;--texto:#172b49;--borda:#dce5ef}
+html{width:100%;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{width:100%;min-width:320px;overflow-x:hidden;background:var(--azul-escuro)!important;color:#fff}
+header{background:var(--azul-escuro)!important;border-bottom:4px solid var(--dourado)!important;padding:24px 14px!important}
+header h1,header h2{color:#fff}
+main{width:100%;max-width:980px!important;margin:0 auto;padding:16px!important}
+.card{background:#fff!important;color:var(--texto)!important;border:1px solid var(--borda);border-top:4px solid var(--dourado);border-radius:16px!important;padding:20px!important;box-shadow:0 5px 18px #00000012}
+h2,h3{color:var(--azul)!important;line-height:1.2}
+input,select,textarea{width:100%;max-width:100%;min-width:0;min-height:46px;padding:13px!important;border:1px solid #cbd7e5!important;border-radius:10px!important;font-size:16px!important;background:#f7f9fc;color:#172b49}
+button{width:100%;min-height:46px;padding:12px 15px!important;border-radius:10px!important;background:var(--azul)!important;color:#fff!important;font-size:16px!important;font-weight:700;border:0;touch-action:manipulation}
+button.azul{background:var(--azul-claro)!important}
+button.verde{background:#28764c!important}
+button.excluir{background:#b83232!important}
+button.cancelar{background:#667085!important}
+button.amarelo{background:#a66b00!important}
+#mensagemLogin,#mensagemRecuperacao,#mensagemNovaSenha{color:#28764c;line-height:1.5;overflow-wrap:anywhere}
+#mensagemLogin:has(+ *){color:#28764c}
+.produto,.pedido,.frete-item{background:#f8fafc;border:1px solid var(--borda);border-radius:12px;padding:14px;margin:12px 0;overflow-wrap:anywhere}
+img{max-width:100%;height:auto}
+table{width:100%;border-collapse:collapse}
+@media(max-width:600px){
+ header{padding:26px 12px!important}
+ header h1{font-size:clamp(28px,8vw,36px)!important;margin:8px 0}
+ header p{font-size:17px!important}
+ main{padding:10px!important}
+ .card{padding:14px!important;margin:12px 0!important;border-radius:15px!important}
+ h2{font-size:clamp(21px,6vw,27px)!important}
+ h3{font-size:19px!important}
+ input,select,textarea{font-size:16px!important;padding:13px!important}
+ button{font-size:16px!important;min-height:48px}
+ .produto,.pedido,.frete-item{padding:12px!important}
+ table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}
+ #painel nav,#painel .menu,.menu-admin,.abas{display:flex;flex-wrap:wrap;gap:8px}
+ #painel nav button,#painel .menu button,.menu-admin button,.abas button{flex:1 1 145px;width:auto}
+}
+@media(max-width:380px){main{padding:8px!important}.card{padding:11px!important}}
+</style>
+
 </head>
 
 <body>
