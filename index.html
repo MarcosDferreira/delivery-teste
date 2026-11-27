@@ -120,6 +120,9 @@ button,a,input,select{touch-action:manipulation}
 @media(max-width:620px){header{background-position:center center}main{padding:13px 11px 24px}.barraca{padding:12px;gap:0 10px;margin:12px 0 17px}.foto-produto{height:130px}.produto{padding:11px 0}.info-produto strong{font-size:14px}.preco{font-size:18px}.carrinho,.conta-topo{padding:13px}.conta-topo{margin-bottom:17px}.conta-topo #acessoCliente{padding:10px}.conta-topo .acoes-conta button{font-size:12px;min-height:52px}.titulo-secao{font-size:23px}.acessibilidade strong{font-size:13px}}
 @media(max-width:390px){.conta-topo .acoes-conta{grid-template-columns:1fr}.conta-topo .acoes-conta button{min-height:43px}}
 @media(max-width:370px){.barraca{grid-template-columns:1fr}.foto-produto{height:185px}}
+/* A loja só aparece depois que o cliente entra na conta. */
+#conteudoLoja{display:none!important}
+body.cliente-autenticado #conteudoLoja{display:block!important}
 </style>
 </head>
 <body>
